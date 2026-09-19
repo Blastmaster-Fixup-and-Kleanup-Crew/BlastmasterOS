@@ -2302,12 +2302,13 @@ CmpSetVersionData(VOID)
 
     /* Set the 'CurrentVersion' value */
     RtlInitUnicodeString(&ValueName, L"CurrentVersion");
+    RtlInitUnicodeString(&ValueData, L"BlastmasterOS");
     NtSetValueKey(CurrentVersionKeyHandle,
                   &ValueName,
                   0,
                   REG_SZ,
-                  CmVersionString.Buffer,
-                  CmVersionString.Length + sizeof(WCHAR));
+                  ValueData.Buffer,
+                  ValueData.Length + sizeof(WCHAR));
 
     /* Set the 'CurrentBuildNumber' value */
     RtlInitUnicodeString(&ValueName, L"CurrentBuildNumber");
