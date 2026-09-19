@@ -473,33 +473,6 @@ DisplayFilter(
     }
 }
 
-#ifdef REACTOS_FANCY_BOOT
-
-/* Returns TRUE if this is Christmas time, or FALSE if not */
-static BOOLEAN
-IsXmasTime(VOID)
-{
-    LARGE_INTEGER SystemTime;
-    TIME_FIELDS Time;
-
-    /* Use KeBootTime if it's initialized, otherwise call the HAL */
-    SystemTime = KeBootTime;
-    if ((SystemTime.QuadPart == 0) && HalQueryRealTimeClock(&Time))
-        RtlTimeFieldsToTime(&Time, &SystemTime);
-
-    ExSystemTimeToLocalTime(&SystemTime, &SystemTime);
-    RtlTimeToTimeFields(&SystemTime, &Time);
-    return ((Time.Month == 12) && (20 <= Time.Day) && (Time.Day <= 31));
-}
-
-#define SELECT_LOGO_ID(LogoIdDefault, Cond, LogoIdAlt) \
-    ((Cond) ? (LogoIdAlt) : (LogoIdDefault))
-
-#else
-
-#define SELECT_LOGO_ID(LogoIdDefault, Cond, LogoIdAlt) (LogoIdDefault)
-
-#endif // REACTOS_FANCY_BOOT
 
 CODE_SEG("INIT")
 VOID
@@ -607,8 +580,7 @@ DisplayBootBitmap(
         MmChangeKernelResourceSectionProtection(MM_READWRITE);
 
         /* Load boot screen logo */
-        BootLogo = InbvGetResourceAddress(
-            SELECT_LOGO_ID(IDB_LOGO_DEFAULT, IsXmas, IDB_LOGO_XMAS));
+        BootLogo = InbvGetResourceAddress(IDB_LOGO_DEFAULT);
 
 #ifdef REACTOS_SKUS
         Text = NULL;
@@ -924,10 +896,6 @@ NTAPI
 DisplayShutdownBitmap(VOID)
 {
     PUCHAR Logo1, Logo2;
-#ifdef REACTOS_FANCY_BOOT
-    /* Decide whether this is a good time to change our logo ;^) */
-    BOOLEAN IsXmas = IsXmasTime();
-#endif
 
 #if 0
     /* Is the boot driver installed? */
@@ -944,8 +912,7 @@ DisplayShutdownBitmap(VOID)
 
     /* Display shutdown logo and message */
     Logo1 = InbvGetResourceAddress(IDB_SHUTDOWN_MSG);
-    Logo2 = InbvGetResourceAddress(
-        SELECT_LOGO_ID(IDB_LOGO_DEFAULT, IsXmas, IDB_LOGO_XMAS));
+    Logo2 = InbvGetResourceAddress(IDB_LOGO_DEFAULT);
 
     if (Logo1 && Logo2)
     {
