@@ -63,7 +63,7 @@ extern BOOLEAN ShowProgressBar;
 /*
  * Change this to modify progress bar behaviour
  */
-#define ROT_BAR_DEFAULT_MODE    RB_PROGRESS_BAR
+#define ROT_BAR_DEFAULT_MODE    RB_SQUARE_CELLS
 
 /*
  * Values for PltRotBarStatus:
