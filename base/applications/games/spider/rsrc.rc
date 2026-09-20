@@ -5,9 +5,9 @@
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
-#define REACTOS_STR_FILE_DESCRIPTION  "ReactOS Spider Solitaire Game"
-#define REACTOS_STR_INTERNAL_NAME     "spider"
-#define REACTOS_STR_ORIGINAL_FILENAME "spider.exe"
+#define REACTOS_STR_FILE_DESCRIPTION  "Spider Solitaire"
+#define REACTOS_STR_INTERNAL_NAME     "Spider Solitaire"
+#define REACTOS_STR_ORIGINAL_FILENAME "SpiderSoliaire.exe"
 #include <reactos/version.rc>
 
 IDI_SPIDER ICON "spider.ico"
