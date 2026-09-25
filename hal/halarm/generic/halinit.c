@@ -22,16 +22,48 @@ VOID
 HalpGetParameters(
     _In_ PLOADER_PARAMETER_BLOCK LoaderBlock)
 {
-    /* Make sure we have a loader block and command line */
     if (LoaderBlock && LoaderBlock->LoadOptions)
     {
-        /* Read the command line */
         PCSTR CommandLine = LoaderBlock->LoadOptions;
 
-        /* Check for initial breakpoint */
         if (strstr(CommandLine, "BREAK"))
             DbgBreakPoint();
     }
+}
+
+static
+VOID
+HalpInitPhase0(
+    _In_ PLOADER_PARAMETER_BLOCK LoaderBlock)
+{
+    UNREFERENCED_PARAMETER(LoaderBlock);
+
+    /*
+     * ARM HAL bootstrap sequence.
+     * This is the minimum initialization required before the kernel
+     * can safely start using the HAL.
+     */
+    HalpInitializeClock();
+    HalpInitializeInterrupts();
+
+    /*
+     * Ensure the interrupt framework is in a sane state before we
+     * start using device timers and profile interrupts.
+     */
+    KfRaiseIrql(KeGetCurrentIrql());
+}
+
+static
+VOID
+HalpInitPhase1(VOID)
+{
+    /*
+     * Board-level and device-level initialization.
+     * The exact devices are board-specific and are implemented in
+     * hal/halarm/<board>/halinit_up.c.
+     */
+    HalpInitializeInterrupts();
+    HalpInitializeDma();
 }
 
 /* FUNCTIONS ******************************************************************/
@@ -48,138 +80,66 @@ HalInitSystem(
 {
     PKPRCB Prcb = KeGetCurrentPrcb();
 
-    /* Check the boot phase */
     if (BootPhase == 0)
     {
-        /* Get command-line parameters */
         HalpGetParameters(LoaderBlock);
 
-        /* Checked HAL requires checked kernel */
 #if DBG
         if (!(Prcb->BuildType & PRCB_BUILD_DEBUG))
         {
-            /* No match, bugcheck */
             KeBugCheckEx(MISMATCHED_HAL, 2, Prcb->BuildType, PRCB_BUILD_DEBUG, 0);
         }
 #else
-        /* Release build requires release HAL */
         if (Prcb->BuildType & PRCB_BUILD_DEBUG)
         {
-            /* No match, bugcheck */
             KeBugCheckEx(MISMATCHED_HAL, 2, Prcb->BuildType, 0, 0);
         }
 #endif
 
 #ifdef CONFIG_SMP
-        /* SMP HAL requires SMP kernel */
         if (Prcb->BuildType & PRCB_BUILD_UNIPROCESSOR)
         {
-            /* No match, bugcheck */
             KeBugCheckEx(MISMATCHED_HAL, 2, Prcb->BuildType, 0, 0);
         }
 #endif
 
-        /* Validate the PRCB */
         if (Prcb->MajorVersion != PRCB_MAJOR_VERSION)
         {
-            /* Validation failed, bugcheck */
             KeBugCheckEx(MISMATCHED_HAL, 1, Prcb->MajorVersion, PRCB_MAJOR_VERSION, 0);
         }
 
-        /* Initialize interrupts */
         HalpInitializeInterrupts();
-
-        /* Force initial PIC state */
         KfRaiseIrql(KeGetCurrentIrql());
 
-        /* Fill out the dispatch tables */
-        //HalQuerySystemInformation = NULL; // FIXME: TODO;
-        //HalSetSystemInformation = NULL; // FIXME: TODO;
-        //HalInitPnpDriver = NULL; // FIXME: TODO
-        //HalGetDmaAdapter = NULL; // FIXME: TODO;
-        //HalGetInterruptTranslator = NULL;  // FIXME: TODO
-        //HalResetDisplay = NULL; // FIXME: TODO;
-        //HalHaltSystem = NULL; // FIXME: TODO;
+        /*
+         * Fill out the dispatch tables.
+         * These are required for kernel/driver-call HAL entry points.
+         */
+        HalQuerySystemInformation = HaliQuerySystemInformation;
+        HalSetSystemInformation = HaliSetSystemInformation;
+        HalInitPnpDriver = HaliInitPnpDriver;
+        HalGetDmaAdapter = HalpGetDmaAdapter;
+        HalGetInterruptTranslator = HalpGetInterruptTranslator;
+        HalResetDisplay = HalpDisplayReset;
+        HalHaltSystem = HaliHaltSystem;
 
-        /* Setup I/O space */
-        //HalpDefaultIoSpace.Next = HalpAddressUsageList;
-        //HalpAddressUsageList = &HalpDefaultIoSpace;
-
-        /* Setup busy waiting */
-        //HalpCalibrateStallExecution();
-
-        /* Initialize the clock */
         HalpInitializeClock();
 
-        /* Setup time increments to 10ms and 1ms */
         HalpCurrentTimeIncrement = 100000;
         HalpNextTimeIncrement = 100000;
         HalpNextIntervalCount = 0;
         KeSetTimeIncrement(100000, 10000);
 
-        /*
-         * We could be rebooting with a pending profile interrupt,
-         * so clear it here before interrupts are enabled
-         */
         HalStopProfileInterrupt(ProfileTime);
 
-        /* Do some HAL-specific initialization */
         HalpInitPhase0(LoaderBlock);
     }
     else if (BootPhase == 1)
     {
-        /* Enable timer interrupt */
-        HalpEnableInterruptHandler(IDT_DEVICE,
-                                   0,
-                                   PRIMARY_VECTOR_BASE,
-                                   CLOCK2_LEVEL,
-                                   HalpClockInterrupt,
-                                   Latched);
-#if 0
-        /* Enable IRQ 8 */
-        HalpEnableInterruptHandler(IDT_DEVICE,
-                                   0,
-                                   PRIMARY_VECTOR_BASE + 8,
-                                   PROFILE_LEVEL,
-                                   HalpProfileInterrupt,
-                                   Latched);
-#endif
-        /* Initialize DMA. NT does this in Phase 0 */
-        //HalpInitDma();
-
-        /* Do some HAL-specific initialization */
         HalpInitPhase1();
     }
 
-    /* All done, return */
     return TRUE;
-}
-
-#include <internal/kd.h>
-ULONG
-DbgPrintEarly(const char *fmt, ...)
-{
-    va_list args;
-    unsigned int i;
-    char Buffer[1024];
-    PCHAR String = Buffer;
-
-    va_start(args, fmt);
-    i = vsnprintf(Buffer, sizeof(Buffer), fmt, args);
-    va_end(args);
-
-    /* Output the message */
-    while (*String != 0)
-    {
-        if (*String == '\n')
-        {
-            KdPortPutByteEx(NULL, '\r');
-        }
-        KdPortPutByteEx(NULL, *String);
-        String++;
-    }
-
-    return STATUS_SUCCESS;
 }
 
 /* EOF */
