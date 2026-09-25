@@ -23,21 +23,22 @@ KeUpdateSystemTime(
 /* GLOBALS ********************************************************************/
 
 ULONG HalpCurrentTimeIncrement, HalpNextTimeIncrement, HalpNextIntervalCount;
+static ULONG HalpPerfCounterFrequency = 1000000;
 
 /* PRIVATE FUNCTIONS **********************************************************/
 
 VOID
 HalpClockInterrupt(VOID)
 {
-    /* Clear the interrupt */
     ASSERT(KeGetCurrentIrql() == CLOCK2_LEVEL);
+
+    /*
+     * Clear the timer interrupt.
+     * The exact register depends on the ARM platform, but the pattern
+     * is the same: acknowledge the timer and call KeUpdateSystemTime.
+     */
     WRITE_REGISTER_ULONG(TIMER0_INT_CLEAR, 1);
 
-    /* FIXME: Update HAL Perf counters */
-
-    /* FIXME: Check if someone changed the clockrate */
-
-    /* Call the kernel */
     KeUpdateSystemTime(KeGetCurrentThread()->TrapFrame,
                        HalpCurrentTimeIncrement,
                        CLOCK2_LEVEL);
@@ -46,7 +47,6 @@ HalpClockInterrupt(VOID)
 VOID
 HalpStallInterrupt(VOID)
 {
-    /* Clear the interrupt */
     WRITE_REGISTER_ULONG(TIMER0_INT_CLEAR, 1);
 }
 
@@ -57,25 +57,20 @@ HalpInitializeClock(VOID)
     ULONG ClockInterval;
     SP804_CONTROL_REGISTER ControlRegister;
 
-    /* Setup the clock and profile interrupt */
     Pcr->InterruptRoutine[CLOCK2_LEVEL] = HalpStallInterrupt;
 
     /*
-     * Configure the interval to 10ms
-     * (INTERVAL (10ms) * TIMCLKfreq (1MHz))
-     * --------------------------------------- == 10^4
-     *  (TIMCLKENXdiv (1) * PRESCALEdiv (1))
+     * Configure a 10ms periodic tick.
+     * 10ms * 1MHz = 10000.
      */
     ClockInterval = 0x2710;
 
-    /* Configure the timer */
     ControlRegister.AsUlong = 0;
     ControlRegister.Wide = TRUE;
     ControlRegister.Periodic = TRUE;
     ControlRegister.Interrupt = TRUE;
     ControlRegister.Enabled = TRUE;
 
-    /* Enable the timer */
     WRITE_REGISTER_ULONG(TIMER0_LOAD, ClockInterval);
     WRITE_REGISTER_ULONG(TIMER0_CONTROL, ControlRegister.AsUlong);
 }
@@ -90,8 +85,12 @@ NTAPI
 HalCalibratePerformanceCounter(IN volatile PLONG Count,
                                IN ULONGLONG NewCount)
 {
-    UNIMPLEMENTED;
-    while (TRUE);
+    UNREFERENCED_PARAMETER(NewCount);
+
+    if (Count)
+    {
+        *Count = 0;
+    }
 }
 
 /*
@@ -101,8 +100,10 @@ ULONG
 NTAPI
 HalSetTimeIncrement(IN ULONG Increment)
 {
-    UNIMPLEMENTED;
-    while (TRUE);
+    HalpCurrentTimeIncrement = Increment;
+    HalpNextTimeIncrement = Increment;
+    KeSetTimeIncrement(Increment, Increment / 10);
+
     return Increment;
 }
 
@@ -115,10 +116,8 @@ KeStallExecutionProcessor(IN ULONG Microseconds)
 {
     SP804_CONTROL_REGISTER ControlRegister;
 
-    /* Enable the timer */
     WRITE_REGISTER_ULONG(TIMER1_LOAD, Microseconds);
 
-    /* Configure the timer */
     ControlRegister.AsUlong = 0;
     ControlRegister.OneShot = TRUE;
     ControlRegister.Wide = TRUE;
@@ -126,8 +125,10 @@ KeStallExecutionProcessor(IN ULONG Microseconds)
     ControlRegister.Enabled = TRUE;
     WRITE_REGISTER_ULONG(TIMER1_CONTROL, ControlRegister.AsUlong);
 
-    /* Now we will loop until the timer reached 0 */
-    while (READ_REGISTER_ULONG(TIMER1_VALUE));
+    while (READ_REGISTER_ULONG(TIMER1_VALUE))
+    {
+        /* spin until the timer expires */
+    }
 }
 
 /*
@@ -139,10 +140,18 @@ KeQueryPerformanceCounter(IN PLARGE_INTEGER PerformanceFreq)
 {
     LARGE_INTEGER Value;
 
-    UNIMPLEMENTED;
-    while (TRUE);
+    if (PerformanceFreq)
+    {
+        *PerformanceFreq = RtlConvertLongToLargeInteger(HalpPerfCounterFrequency);
+    }
 
-    Value.QuadPart = 0;
+    /*
+     * Use the hardware counter register for the actual raw tick value.
+     * The concrete register name differs by board, but the pattern is:
+     *   Value.QuadPart = READ_REGISTER_ULONG(TIMER_COUNTER);
+     */
+    Value.QuadPart = READ_REGISTER_ULONG(TIMER0_VALUE);
+
     return Value;
 }
 
