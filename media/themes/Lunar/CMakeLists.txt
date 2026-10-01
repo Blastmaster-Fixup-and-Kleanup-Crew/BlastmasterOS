@@ -1,2 +1,2 @@
 
-add_subdirectory(lunar.msstyles)
+add_subdirectory(luna.msstyles)
