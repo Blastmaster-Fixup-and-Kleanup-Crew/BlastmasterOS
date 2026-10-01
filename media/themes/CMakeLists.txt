@@ -1,6 +1,6 @@
 
-# Blackshade is just a placeholder for now.
+# Blackshade and Luna are just placeholders for now.
 # add_subdirectory(Blackshade)
 add_subdirectory(Lautus)
-add_subdirectory(Luna)
+# add_subdirectory(Luna)
 add_subdirectory(Modern)
