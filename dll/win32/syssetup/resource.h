@@ -23,7 +23,6 @@
 #define IDB_CLASSIC   102
 #define IDB_LAUTUS    103
 #define IDB_LUNAR     104
-#define IDB_MIZU      105
 #define IDB_REACTOS   106
 #define IDB_LINE      107
 
@@ -171,7 +170,6 @@
 #define IDS_CLASSIC 3800
 #define IDS_LAUTUS  3801
 #define IDS_LUNAR   3802
-#define IDS_MIZU    3803
 
 #define IDS_INSTALLATIONTITLE           3900
 #define IDS_INSTALLATIONSUBTITLE        3901
