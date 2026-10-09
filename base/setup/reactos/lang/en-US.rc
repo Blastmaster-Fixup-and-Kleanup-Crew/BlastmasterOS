@@ -16,7 +16,7 @@ under active development. Use it for evaluation and testing only, \
 not as your daily-use operating system.\n\
 It may fail or cause data loss. Test in a virtual machine whenever possible.", IDC_WARNTEXT2, 120, 80, 190, 50, SS_CENTER
     LTEXT "Back up important data or test in a virtual machine \
-if you attempt to run ReactOS on real hardware.", IDC_WARNTEXT3, 120, 130, 190, 27, SS_CENTER
+if you attempt to run BlastmasterOS on real hardware.", IDC_WARNTEXT3, 120, 130, 190, 27, SS_CENTER
 ////
     LTEXT "Click Next to continue with Setup.", IDC_STATIC, 115, 169, 195, 17
 END
