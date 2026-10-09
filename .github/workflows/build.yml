@@ -78,6 +78,12 @@ jobs:
       run: set -o pipefail && echo 'cmake --build ${{github.workspace}}/build -- -k0' | ${{github.workspace}}/RosBE-CI/RosBE.sh . 0 ${{matrix.arch}} 2>&1 | sed 's|^\.\./src/|${{github.workspace}}/src/|'
     - name: Generate ISOs
       run: echo 'cmake --build ${{github.workspace}}/build --target bootcd' | ${{github.workspace}}/RosBE-CI/RosBE.sh . 0 ${{matrix.arch}}
+    - name: Validate generated ISO
+      shell: bash
+      run: |
+        test -s build/bootcd.iso
+        file build/bootcd.iso
+        sha256sum build/bootcd.iso | tee build/bootcd.iso.sha256
     - name: Print ccache statistics
       run: ccache -s
     - name: Upload ISOs
@@ -136,6 +142,14 @@ jobs:
       run: cmake --build build -- -k0
     - name: Generate ISOs
       run: cmake --build build --target bootcd
+    - name: Validate generated ISO
+      shell: pwsh
+      run: |
+        $iso = Join-Path $PWD 'build/bootcd.iso'
+        if (!(Test-Path -LiteralPath $iso -PathType Leaf)) { throw 'Build did not produce build/bootcd.iso.' }
+        $item = Get-Item -LiteralPath $iso
+        if ($item.Length -le 0) { throw 'build/bootcd.iso is empty.' }
+        Get-FileHash -LiteralPath $iso -Algorithm SHA256
     - name: Upload ISOs
       uses: actions/upload-artifact@v7
       with:
@@ -307,6 +321,14 @@ jobs:
       run: cmake --build build -- -k0
     - name: Generate ISOs
       run: cmake --build build --target bootcd
+    - name: Validate generated ISO
+      shell: pwsh
+      run: |
+        $iso = Join-Path $PWD 'build/bootcd.iso'
+        if (!(Test-Path -LiteralPath $iso -PathType Leaf)) { throw 'Build did not produce build/bootcd.iso.' }
+        $item = Get-Item -LiteralPath $iso
+        if ($item.Length -le 0) { throw 'build/bootcd.iso is empty.' }
+        Get-FileHash -LiteralPath $iso -Algorithm SHA256
     - name: Upload ISOs
       uses: actions/upload-artifact@v7
       with:
