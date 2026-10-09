@@ -7,7 +7,7 @@ STRINGTABLE
 BEGIN
     IDS_APPTITLE "BlastmasterOS - Welcome"
     IDS_DEFAULT_TOPIC_TITLE "BlastmasterOS"
-    IDS_DEFAULT_TOPIC_DESC "Welcome to BlastmastertOS Operating System.\n\nClick a topic on the left."
+    IDS_DEFAULT_TOPIC_DESC "Welcome to BlastmasterOS.\n\nClick a topic on the left."
     IDS_FONTNAME "Tahoma"
     IDS_CHECKTEXT "&Show this dialog again"
     IDS_CLOSETEXT "&Exit"
@@ -32,7 +32,7 @@ END
 /* Topic descriptions */
 STRINGTABLE
 BEGIN
-    IDS_TOPIC_DESC0 "Create a new BlastmasterOS installation on your computer or upgrade an existing installation."
+    IDS_TOPIC_DESC0 "Install BlastmasterOS on this computer. Existing installations may be updated where supported."
     IDS_TOPIC_DESC1 "Browse the CD."
     IDS_TOPIC_DESC2 "Click to exit this application."
 END
