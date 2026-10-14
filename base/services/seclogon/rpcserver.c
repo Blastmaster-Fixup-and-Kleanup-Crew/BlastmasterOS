@@ -75,9 +75,7 @@ SeclCreateProcessWithLogonW(
     {
         TRACE("Username: '%S'\n", pRequest->Username);
         TRACE("Domain: '%S'\n", pRequest->Domain);
-        TRACE("Password: '%S'\n", pRequest->Password);
         TRACE("ApplicationName: '%S'\n", pRequest->ApplicationName);
-        TRACE("CommandLine: '%S'\n", pRequest->CommandLine);
         TRACE("CurrentDirectory: '%S'\n", pRequest->CurrentDirectory);
         TRACE("LogonFlags: 0x%lx\n", pRequest->dwLogonFlags);
         TRACE("CreationFlags: 0x%lx\n", pRequest->dwCreationFlags);
