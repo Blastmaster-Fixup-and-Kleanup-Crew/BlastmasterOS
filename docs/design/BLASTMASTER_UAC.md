@@ -23,7 +23,7 @@ Audit the existing security subsystem before changing it. Document the current s
 
 ### 2. Elevation broker
 
-Add an AppInfo-style broker service responsible for validating elevation requests and launching processes with the requested token. Requests must be authenticated, validated, and bound to the requesting process and target executable. The broker must not accept arbitrary caller-supplied token handles, paths, or command lines without validation. Apply least privilege to the service itself and log failures without recording secrets.
+Audit the existing Secondary Logon service (`base/services/seclogon`) and `runas` utility (`base/applications/runas`) first. Reuse and extend the existing service and launch contract where suitable instead of introducing a competing broker. Determine whether a separate AppInfo-style service is needed only after documenting the current service's trust boundary and capabilities. Any elevation broker must authenticate and validate requests, bind them to the requesting process and target executable, reject unsafe caller-supplied token handles/paths/command lines, run with least privilege, and avoid logging secrets.
 
 ### 3. Consent UI
 
