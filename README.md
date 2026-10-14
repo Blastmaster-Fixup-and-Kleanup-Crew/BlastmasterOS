@@ -17,11 +17,38 @@ BlastmasterOS is under active development. Features, device support, installatio
 ## Current project direction
 
 - Establish consistent BlastmasterOS product branding.
-- Develop the classic Luna-inspired desktop appearance.
+- Develop the desktop appearance, including the planned Aero-inspired theme and a reliable Classic/opaque fallback.
 - Improve boot, installation, and hardware reliability.
 - Validate builds and bootable ISO images before release.
 
 These are project goals, not a claim that every item is already implemented or working.
+
+## Runtime system requirements (provisional)
+
+BlastmasterOS does not yet have a tested, officially guaranteed minimum configuration. The figures below are **development targets for planning and virtual-machine testing**, not proof that every configuration boots or that Aero composition is implemented.
+
+| Component | Baseline / fallback desktop test target | Aero development target |
+|---|---|---|
+| Processor | x86-compatible CPU; 1 virtual CPU for basic smoke tests | 2 virtual CPU cores recommended |
+| Memory | 1 GB for basic boot experiments (may be insufficient) | **2 GB minimum target; 4 GB recommended** |
+| Storage | 10 GB virtual disk for initial experiments | **20 GB minimum target; 32 GB recommended** to leave room for updates, applications, and test snapshots |
+| Display | VGA-compatible virtual adapter | **1024 × 768 or higher**; test 1280 × 720 as well |
+| Graphics | Adapter supported by the current build | A working display driver and a future verified composition-capable rendering path; hardware acceleration is not currently guaranteed |
+| Firmware / boot | Legacy BIOS-compatible virtual machine is the conservative starting point | Same baseline until UEFI boot is validated for the target build |
+| Input | Standard keyboard and mouse | Same, with keyboard-only navigation included in theme testing |
+
+### Recommended VM profile for Aero development
+
+- 2 virtual CPU cores
+- 4 GB RAM
+- 32 GB disposable virtual disk
+- VGA-compatible virtual graphics adapter, using the VM's supported display settings
+- 1024 × 768 baseline resolution, followed by 1280 × 720
+- A snapshot before installation and before theme/compositor changes
+
+**Important:** Raising memory and disk allocations does not enable Aero by itself. The current DWM code is an API shim and the real compositor, redirected-window surfaces, and glass-frame rendering still need implementation and validation. Until then, use the Classic/opaque fallback. Do not interpret these targets as confirmed minimum requirements or a promise of hardware compatibility. See the [Aero theme design and release gates](docs/design/BLASTMASTER_AERO_THEME.md).
+
+---
 
 ## Build
 
