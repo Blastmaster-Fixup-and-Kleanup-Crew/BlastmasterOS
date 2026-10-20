@@ -44,21 +44,19 @@ WINE_DEFAULT_DEBUG_CHANNEL(dwmapi);
 HRESULT WINAPI DwmIsCompositionEnabled(BOOL *enabled)
 {
 
-#ifdef __REACTOS__
-    RTL_OSVERSIONINFOW version;
-#else
-    RTL_OSVERSIONINFOEXW version;
-#endif
-
     TRACE("%p\n", enabled);
 
     if (!enabled)
         return E_INVALIDARG;
 
+    /*
+     * Do not infer composition support from the reported OS version.
+     * This implementation does not provide a DWM compositor yet, so
+     * advertising composition here would cause callers to assume that
+     * glass frames and other composition effects are actually available.
+     * Keep the capability disabled until the compositor is implemented.
+     */
     *enabled = FALSE;
-    version.dwOSVersionInfoSize = sizeof(version);
-    if (!RtlGetVersion(&version))
-        *enabled = (version.dwMajorVersion > 6 || (version.dwMajorVersion == 6 && version.dwMinorVersion >= 3));
 
     return S_OK;
 }
@@ -68,7 +66,19 @@ HRESULT WINAPI DwmIsCompositionEnabled(BOOL *enabled)
  */
 HRESULT WINAPI DwmEnableComposition(UINT uCompositionAction)
 {
-    FIXME("(%d) stub\n", uCompositionAction);
+    TRACE("(%u)\n", uCompositionAction);
+
+    /*
+     * This build does not contain a window compositor. Do not report
+     * success for an operation that cannot be performed; callers can
+     * then retain the classic, non-composited window-frame path.
+     */
+    if (uCompositionAction != DWM_EC_DISABLECOMPOSITION &&
+        uCompositionAction != DWM_EC_ENABLECOMPOSITION)
+        return E_INVALIDARG;
+
+    if (uCompositionAction == DWM_EC_ENABLECOMPOSITION)
+        return DWM_E_COMPOSITIONDISABLED;
 
     return S_OK;
 }
@@ -78,9 +88,17 @@ HRESULT WINAPI DwmEnableComposition(UINT uCompositionAction)
  */
 HRESULT WINAPI DwmExtendFrameIntoClientArea(HWND hwnd, const MARGINS* margins)
 {
-    FIXME("(%p, %p) stub\n", hwnd, margins);
+    TRACE("(%p, %p)\n", hwnd, margins);
 
-    return S_OK;
+    if (!IsWindow(hwnd) || !margins)
+        return E_INVALIDARG;
+
+    /*
+     * Glass-frame extension requires a compositor-backed surface. Until
+     * that renderer exists, fail explicitly instead of claiming that the
+     * client-area frame was extended when nothing was drawn.
+     */
+    return DWM_E_COMPOSITIONDISABLED;
 }
 
 /**********************************************************************
