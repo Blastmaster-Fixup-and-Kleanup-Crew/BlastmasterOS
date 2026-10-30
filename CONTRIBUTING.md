@@ -1,6 +1,6 @@
 # How To Contribute
 
-There are several ways to contribute to the development of ReactOS. The most often encountered problem is not knowing where to begin or what to do. If you are able to program or understand the technical information that is pertinent to this project, helping the development can be easy.
+There are several ways to contribute to the development of BlastmasterOS. The most often encountered problem is not knowing where to begin or what to do. If you are able to program or understand the technical information that is pertinent to this project, helping the development can be easy.
 
 - [What To Do?](#what-to-do)
 - [How To Contribute?](#how-to-contribute)
@@ -27,17 +27,17 @@ Tests are used to check the functionality and correctness of APIs on ReactOS com
 
 [Coverity] is enhanced static analysis that uncovers leaks, buffer overflows, security issues and other. We do such scans on ReactOS codebase pretty often. You can [request][request-coverity] to see Coverity 'defects' and help to fix them.
 
-### Test ReactOS
+### Test BlastmasterOS
 
 By localizing bugs, developers can identify what causes the bug and which part it affects. There are a variety of methods to [debug] ReactOS while testing it. After identifying a bug, check if it is already known about by searching on JIRA and adding any additional information to the report. If you think that it is an unidentified bug, consider [filing a bug report].
 
 ### Implement new things
 
-Considering ReactOS is alpha quality software, there is a lot of [missing functionality] that Windows operating systems have. Before starting a project to implement something, find out whether another person is working on the same thing. If you find that someone is already working on it, ask if any assistance is needed for what specifically is being worked on or a related project. More often than not, someone will start to implement something and move onto something else before it's complete. Make sure you stay committed to what you are going to implement, and do not be afraid to ask for assistance if you need help with something.
+Considering BlastmasterOS is alpha quality software, there is a lot of [missing functionality] that Windows operating systems have. Before starting a project to implement something, find out whether another person is working on the same thing. If you find that someone is already working on it, ask if any assistance is needed for what specifically is being worked on or a related project. More often than not, someone will start to implement something and move onto something else before it's complete. Make sure you stay committed to what you are going to implement, and do not be afraid to ask for assistance if you need help with something.
 
 ### Write documentation
 
-There are some important points if you would like to help document ReactOS:
+There are some important points if you would like to help document BlastmasterOS:
 
 1. Make sure the documentation does not exist yet (if it does, help improve it).
 2. Respect [clean room reverse engineering] practices.
