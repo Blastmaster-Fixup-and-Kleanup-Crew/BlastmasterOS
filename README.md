@@ -17,11 +17,12 @@ BlastmasterOS is under active development. Features, device support, installatio
 ## Current project direction
 
 - Establish consistent BlastmasterOS product branding.
-- Develop the desktop appearance, including the planned Aero-inspired theme and a reliable Classic/opaque fallback.
+- Ship the built-in Classic, non-composited desktop as the current release experience.
+- Keep DWM compositor, Aero, and Luna source code in the repository for future releases; these features are deferred and are not included as enabled release features.
 - Improve boot, installation, and hardware reliability.
 - Validate builds and bootable ISO images before release.
 
-These are project goals, not a claim that every item is already implemented or working.
+These are project goals, not a claim that every item is already implemented or working. See [Deferred desktop features](docs/DEFERRED_DESKTOP_FEATURES.md) for the current release boundary.
 
 ## Runtime system requirements (provisional)
 
