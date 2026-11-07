@@ -160,7 +160,7 @@ if "!CMAKE_GENERATOR!" == "Ninja" (
 )
 
 REM Display information
-echo Configuring a new ReactOS build on:
+echo Configuring a new BlastmasterOS build on:
 (for /f "delims=" %%x in ('ver') do @echo %%x) & echo.
 
 REM Create directories
