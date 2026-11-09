@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ "x$ROS_ARCH" = "x" ]; then
-	echo "Could not detect RosBE."
+	echo "BosDE environment not detected. Activate BlastmasterOS Dev Environment and select a target architecture."
 	exit 1
 fi
 

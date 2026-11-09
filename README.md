@@ -53,42 +53,62 @@ BlastmasterOS does not yet have a tested, officially guaranteed minimum configur
 
 ## Build
 
-BlastmasterOS uses the CMake-based ReactOS build system and supports Ninja-based build configurations. The repository includes CMake presets and toolchain files.
+**BosDE (BlastmasterOS Dev Environment) is the supported and recommended build environment for BlastmasterOS.** Use the matching version of the [BlastmasterOS Dev Environment](https://github.com/Blastmaster-Fixup-and-Kleanup-Crew/BlastmasterOS-Dev-Environment) with this source tree. BosDE supplies the project-configured compiler toolchain, custom CMake, Ninja, build utilities, environment variables, and helper scripts expected by the build system.
+
+Do not treat a generic MSYS2 shell or a separately installed MinGW toolchain as a complete BosDE replacement. Individual tools may be present while required target-prefixed tools, versions, environment settings, or patches are still missing. Building outside BosDE is an unsupported/manual configuration and may fail or produce unvalidated results.
 
 ### Prerequisites
 
-Use a supported compiler toolchain for the target platform, along with CMake, Ninja, and the additional build tools required by the project. The upstream ReactOS build documentation is a useful reference for toolchain setup.
+- The BlastmasterOS source repository.
+- The matching [BlastmasterOS Dev Environment (BosDE)](https://github.com/Blastmaster-Fixup-and-Kleanup-Crew/BlastmasterOS-Dev-Environment).
+- A BosDE-supported target architecture, such as `i386` or `amd64`.
+- Sufficient disk space for the build tree and generated artifacts.
 
-- [CMake](https://cmake.org/)
-- [Ninja](https://ninja-build.org/)
-- [ReactOS build documentation](https://reactos.org/wiki/Building_ReactOS)
+### Recommended build procedure
 
-### Configure and build
+1. Install or update BosDE using its own repository instructions.
+2. Clone the BlastmasterOS and BlastmasterOS-Dev-Environment repositories in the layout expected by BosDE, or set `BLASTMASTEROS_SOURCE_DIR` to the OS source directory.
+3. Open the BosDE build shell for the desired architecture. Do not substitute a plain MSYS2 MinGW32/UCRT64 shell.
+4. Run the BosDE helper from the BlastmasterOS-Dev-Environment repository:
 
-From the repository root, inspect the available presets first:
+   **Windows:**
+   ```bat
+   build-blastmasteros.cmd
+   ```
+
+   **Unix:**
+   ```sh
+   ./build-blastmasteros.sh
+   ```
+
+The helper configures and builds BlastmasterOS in BosDE's separate build directory. Pass additional CMake options to the helper when needed, for example `build-blastmasteros.cmd -DDBG:BOOL=0`.
+
+### Manual configuration (BosDE shell only)
+
+If you need to configure manually, first activate the appropriate BosDE architecture environment, then inspect the presets:
 
 ```sh
 cmake --list-presets
 ```
 
-Choose an appropriate preset listed by that command, then configure and build it. For example, a preset named `mingw-i386-debug` can be used as follows:
+For a 32-bit Debug build, the corresponding preset is:
 
 ```sh
 cmake --preset mingw-i386-debug
-cmake --build output-MinGW-i386
+cmake --build output-MinGW-i386 --parallel
 ```
 
-Preset names and build directories can change; use the names actually listed in the checked-out `CMakePresets.json`. A full build may require platform-specific dependencies and considerable disk space.
+Use the CMake and compiler tools provided by the active BosDE shell. The preset alone does not install or activate the required toolchain.
 
 ### Build a bootable ISO
 
-After a successful configuration, generate the bootable CD image with the project's `bootcd` target. For a build directory named `output-MinGW-i386`, for example:
+After a successful build, generate the bootable CD image from the configured build directory:
 
 ```sh
-cmake --build output-MinGW-i386 --target bootcd
+cmake --build output-MinGW-i386 --target bootcd --parallel
 ```
 
-The build output location and ISO filename depend on the selected configuration. Confirm the actual artifact path in the build output before distributing it. A generated ISO should be boot-tested in a virtual machine before being treated as release-ready.
+The output location and ISO filename depend on the selected configuration. Confirm the artifact path in the build output and boot-test the image in a virtual machine before treating it as release-ready.
 
 ## Installation and testing
 

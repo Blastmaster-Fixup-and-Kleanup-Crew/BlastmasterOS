@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.17.0)
 
 if(NOT CMAKE_VERSION MATCHES "ReactOS")
-    message(WARNING "Building with \"${CMAKE_COMMAND}\", which is not the custom CMake included in RosBE, might cause build issues...")
+    message(WARNING "Building with \"${CMAKE_COMMAND}\", which is not the custom CMake bundled with BosDE (BlastmasterOS Dev Environment). Use the BosDE-provided CMake and toolchain to avoid unsupported build configurations.")
 endif()
 
 include(CMakeDependentOption)
