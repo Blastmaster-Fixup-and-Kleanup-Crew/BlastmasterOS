@@ -41,7 +41,7 @@ cmd /c cmake --version 2>&1 | find "cmake version" > NUL || goto cmake_notfound
 
 REM Detect build environment (MinGW, VS, WDK, ...)
 if defined ROS_ARCH (
-    echo Detected RosBE for %ROS_ARCH%
+    echo Detected BosDE MinGW environment for %ROS_ARCH%
     set BUILD_ENVIRONMENT=MinGW
     set ARCH=%ROS_ARCH%
     set MINGW_TOOCHAIN_FILE=toolchain-gcc.cmake
