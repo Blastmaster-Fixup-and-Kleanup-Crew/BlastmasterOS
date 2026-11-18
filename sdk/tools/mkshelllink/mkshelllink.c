@@ -231,8 +231,8 @@ static const struct SPECIALFOLDER
     const char* dummyPath;
     const char* unexpPath;
 } g_specialfolders[] = {
-    { CSIDL_WINDOWS, "windows", "X:\\reactos", "%SystemRoot%" },
-    { CSIDL_SYSTEM,  "system",  "X:\\reactos\\system32", "%SystemRoot%\\system32" },
+    { CSIDL_WINDOWS, "windows", "X:\\BlastmasterOS", "%SystemRoot%" },
+    { CSIDL_SYSTEM,  "system",  "X:\\BlastmasterOS\\system32", "%SystemRoot%\\system32" },
     { 0, NULL, NULL, NULL }
 };
 
